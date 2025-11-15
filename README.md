@@ -1,2 +1,160 @@
-# PrimaireNote
-Application d'affichage de note pour primaire
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimaireNote</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f2f2f2;
+        }
+        h1 { color: #2c3e50; }
+        input { margin: 5px; padding: 8px; width: 200px; }
+        button { padding: 8px 12px; margin-top: 10px; background-color: #3498db; color: white; border: none; border-radius: 4px; }
+        button:hover { background-color: #2980b9; }
+        #notes p { background-color: white; padding: 5px; margin: 5px; border-radius: 4px; }
+        
+        /* Profil utilisateur en haut à droite */
+        #userProfile {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        #userProfile img <img src=".html" alt="ethan.jpg">
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+        }
+        #userProfile span {
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        #moyenneDiv { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>PrimaireNote</h1>
+
+    <!-- Connexion -->
+    <div id="login">
+        <h2>Connexion</h2>
+        <input type="email" id="email" placeholder="Nom d'utilisateur">
+        <input type="password" id="password" placeholder="Mot de passe">
+        <br>
+        <button id="loginBtn">Se connecter</button>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" style="display:none;">
+        <!-- Profil utilisateur -->
+        <div id="userProfile">
+            <img id="userImage" src="" alt="Photo utilisateur">
+            <span id="userName"></span>
+        </div>
+
+        <h2>Tableau de notes</h2>
+        <div id="notes"></div>
+
+        <!-- Moyenne générale -->
+        <div id="moyenneDiv">
+            <p>Moyenne générale : <span id="moyenne">-</span></p>
+            <button id="editMoyenneBtn" onclick="editMoyenne()">Modifier la moyenne</button>
+        </div>
+
+        <button id="addNoteBtn" onclick="addNote()">Ajouter une note</button>
+    </div>
+
+    <script>
+        // Comptes fixes
+        const users = [
+            { name: "Aaron Dumoulin", email: "aarond", password: "aarond", role: "prof", img: "aaron.png" },
+            { name: "Ethan Dumoulin", email: "ethanD", password: "dudu2019", role: "eleve", img: "ethan.jpg" }
+        ];
+
+        // Charger notes et moyenne depuis LocalStorage
+        let notes = JSON.parse(localStorage.getItem("notes")) || [];
+        let moyenne = localStorage.getItem("moyenne") || "-";
+
+        // Bouton connexion
+        const loginBtn = document.getElementById("loginBtn");
+        loginBtn.addEventListener("click", function() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            const user = users.find(u => u.email === email && u.password === password);
+            if(!user) {
+                alert("nom d'utilisateur ou mot de passe incorrect.");
+                return;
+            }
+
+            alert(`Connecté en tant que ${user.role} : ${user.name}`);
+
+            document.getElementById("login").style.display = "none";
+            document.getElementById("dashboard").style.display = "block";
+
+            // Affichage du profil
+            document.getElementById("userImage").src = user.img;
+            document.getElementById("userName").textContent = user.name;
+
+            // Afficher/masquer boutons selon rôle
+            if(user.role === "eleve") {
+                document.getElementById("addNoteBtn").style.display = "none";
+                document.getElementById("editMoyenneBtn").style.display = "none";
+            }
+
+            renderNotes();
+            renderMoyenne(user.role);
+        });
+
+        // Ajouter une note (Prof uniquement)
+        function addNote() {
+            const matiere = prompt("Matière ?");
+            if(!matiere) return;
+            const note = prompt("Note ?");
+            if(!note) return;
+
+            notes.push({ matiere, note });
+            localStorage.setItem("notes", JSON.stringify(notes));
+            renderNotes();
+        }
+
+        // Afficher les notes
+        function renderNotes() {
+            const div = document.getElementById("notes");
+            div.innerHTML = "";
+            if(notes.length === 0) {
+                div.innerHTML = "<p>Aucune note ajoutée.</p>";
+                return;
+            }
+            notes.forEach((n,i)=>{
+                div.innerHTML += `<p>${i+1}. ${n.matiere} : ${n.note}</p>`;
+            });
+        }
+
+        // Afficher la moyenne et gérer l’accès
+        function renderMoyenne(userRole) {
+            document.getElementById("moyenne").textContent = moyenne;
+            if(userRole === "eleve") {
+                document.getElementById("editMoyenneBtn").style.display = "none";
+            } else {
+                document.getElementById("editMoyenneBtn").style.display = "inline-block";
+            }
+        }
+
+        // Modifier la moyenne (Prof uniquement)
+        function editMoyenne() {
+            const newMoyenne = prompt("Nouvelle moyenne générale ?", moyenne);
+            if(newMoyenne !== null && newMoyenne.trim() !== "") {
+                moyenne = newMoyenne;
+                localStorage.setItem("moyenne", moyenne);
+                renderMoyenne("prof");
+            }
+        }
+    </script>
+</body>
+</html>
