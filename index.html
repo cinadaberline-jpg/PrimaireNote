@@ -1,160 +1,405 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <link rel="manifest" href="manifest.json">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrimaireNote</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-            background-color: #f2f2f2;
-        }
-        h1 { color: #2c3e50; }
-        input { margin: 5px; padding: 8px; width: 200px; }
-        button { padding: 8px 12px; margin-top: 10px; background-color: #3498db; color: white; border: none; border-radius: 4px; }
-        button:hover { background-color: #2980b9; }
-        #notes p { background-color: white; padding: 5px; margin: 5px; border-radius: 4px; }
-        
-        /* Profil utilisateur en haut à droite */
-        #userProfile {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        #userProfile img {<img src=".html" alt="ethan.jpg">
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-        }
-        #userProfile span {
-            margin-left: 10px;
-            font-weight: bold;
-        }
-        #moyenneDiv { margin-top: 10px; }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PrimaireNote</title>
+<style>
+  :root{
+    --bg:#244f44;
+    --card:#294c44;
+    --accent1:#FF4136;
+    --accent2:#FFB700;
+    --accent3:#000000;
+    --header-gradient: linear-gradient(130deg,#ff3b30,#ff9a00,#ff45d9,#00b0ff);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color:#fff;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* header */
+  .header {
+    background: var(--header-gradient);
+    padding:18px 14px 28px 14px;
+    border-bottom-left-radius:60px;
+    border-bottom-right-radius:60px;
+    position:relative;
+  }
+  .header-inner{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .brand-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .brand-left img.logo{
+    width:72px;
+    height:72px;
+    border-radius:14px;
+    border:3px solid rgba(255,255,255,0.92);
+    object-fit:cover;
+    background:#fff;
+  }
+  .brand-text{
+    line-height:1;
+  }
+  .brand-text .appname{font-size:20px;font-weight:800}
+  .brand-text .subtitle{font-size:13px;opacity:0.95;margin-top:4px}
+
+  /* profile top-right */
+  .profile {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#fff;
+    text-align:right;
+  }
+  .profile img{
+    width:56px;height:56px;border-radius:50%;border:3px solid rgba(255,255,255,0.9);object-fit:cover;
+  }
+  .profile .name{font-weight:800}
+  .profile .role{font-size:12px;opacity:0.95}
+
+  /* main */
+  .main{
+    padding:12px 12px 80px 12px;
+  }
+  .card{
+    background:rgba(0,0,0,0.14);
+    margin:10px auto;border-radius:14px;padding:14px;width:94%;
+    text-align:center;
+  }
+  .role-select{display:flex;gap:10px;justify-content:center;margin-top:6px;flex-wrap:wrap}
+  .role-select label{background:rgba(255,255,255,0.06);padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700}
+  input[type="password"]{
+    width:92%;padding:12px;border-radius:10px;border:none;margin:10px 0;font-size:16px;
+    background: rgba(255,255,255,0.06); color: #fff;
+  }
+
+  .controls{display:flex;gap:10px;justify-content:center;margin:8px 0 18px 0;}
+  .btn{
+    background:#35a4ff;
+    color:#fff;border:none;padding:10px 14px;border-radius:12px;font-weight:700;font-size:16px;
+  }
+  .btn.ghost{background:transparent;border:2px solid rgba(255,255,255,0.14)}
+  .note-list{margin-top:6px}
+  .note{
+    background:var(--card);
+    margin:10px 8px;
+    padding:14px 14px;
+    border-radius:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+  }
+  .note-left{display:flex;align-items:center;gap:10px}
+  .note-dot{width:8px;height:36px;border-radius:3px}
+  .note-title{font-size:18px;font-weight:800}
+  .note-sub{font-size:13px;opacity:0.9;margin-top:4px}
+  .note-score{font-weight:800;font-size:20px}
+
+  .avg{
+    margin:18px 12px;
+    background:rgba(0,0,0,0.22);
+    padding:16px;border-radius:16px;text-align:center;font-weight:800;font-size:18px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .avg .value{font-size:22px;color:#bfffbf}
+
+  .small{font-size:13px;opacity:0.9;margin-top:6px}
+
+  .delete-btn{background:transparent;border:none;color:#fff;font-weight:900;font-size:18px;opacity:0.9;cursor:pointer}
+  .delete-btn:hover{opacity:1}
+</style>
 </head>
 <body>
-    <h1>PrimaireNote</h1>
 
-    <!-- Connexion -->
-    <div id="login">
-        <h2>Connexion</h2>
-        <input type="email" id="email" placeholder="Nom d'utilisateur">
-        <input type="password" id="password" placeholder="Mot de passe">
-        <br>
-        <button id="loginBtn">Se connecter</button>
+<!-- Header -->
+<div class="header">
+  <div class="header-inner">
+    <div class="brand-left">
+      <img src="logo.png" class="logo" id="logoMain" alt="PrimaireNote logo">
+      <div class="brand-text">
+        <div class="appname">PrimaireNote</div>
+        <div class="subtitle">Application de notes</div>
+      </div>
     </div>
 
-    <!-- Dashboard -->
-    <div id="dashboard" style="display:none;">
-        <!-- Profil utilisateur -->
-        <div id="userProfile">
-            <img id="userImage" src="" alt="Photo utilisateur">
-            <span id="userName"></span>
-        </div>
+    <!-- profile box (hidden until login) -->
+    <div class="profile" id="profileBox" style="visibility:hidden">
+      <div style="text-align:right">
+        <div class="name" id="profileName">Nom</div>
+        <div class="role" id="profileRole">Rôle</div>
+      </div>
+      <img id="profileImg" src="" alt="photo" style="display:none">
+    </div>
+  </div>
+</div>
 
-        <h2>Tableau de notes</h2>
-        <div id="notes"></div>
+<!-- Main -->
+<div class="main">
 
-        <!-- Moyenne générale -->
-        <div id="moyenneDiv">
-            <p>Moyenne générale : <span id="moyenne">-</span></p>
-            <button id="editMoyenneBtn" onclick="editMoyenne()">Modifier la moyenne</button>
-        </div>
+  <!-- LOGIN CARD -->
+  <div id="loginCard" class="card">
+    <h2>Connexion</h2>
 
-        <button id="addNoteBtn" onclick="addNote()">Ajouter une note</button>
+    <div class="role-select" aria-hidden="false">
+      <label><input type="radio" name="role" value="eleve" checked> Élève</label>
+      <label><input type="radio" name="role" value="prof"> Prof</label>
     </div>
 
-    <script>
-        // Comptes fixes
-        const users = [
-            { name: "Aaron Dumoulin", email: "aarond", password: "aarond", role: "prof", img: "aaron.png" },
-            { name: "Ethan Dumoulin", email: "ethanD", password: "dudu2019", role: "eleve", img: "ethan.jpg" }
-        ];
+    <div style="margin-top:12px;">
+      <input id="passwordInput" type="password" placeholder="Mot de passe">
+    </div>
 
-        // Charger notes et moyenne depuis LocalStorage
-        let notes = JSON.parse(localStorage.getItem("notes")) || [];
-        let moyenne = localStorage.getItem("moyenne") || "-";
+    <div style="margin-top:12px;">
+      <button class="btn" id="loginBtn">Se connecter</button>
+    </div>
 
-        // Bouton connexion
-        const loginBtn = document.getElementById("loginBtn");
-        loginBtn.addEventListener("click", function() {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
+    <div class="small" style="margin-top:8px; opacity:0.0; height:0;"> <!-- hint removed and hidden for security --> </div>
+  </div>
 
-            const user = users.find(u => u.email === email && u.password === password);
-            if(!user) {
-                alert("nom d'utilisateur ou mot de passe incorrect.");
-                return;
-            }
+  <!-- DASHBOARD (hidden until login) -->
+  <div id="dashboard" style="display:none;">
+    <div class="controls">
+      <button class="btn" id="btnAddNote" style="display:none">+ Ajouter note</button>
+      <button class="btn ghost" id="btnEditAvg" style="display:none">Modifier moyenne</button>
+      <button class="btn ghost" id="btnLogout">Déconnexion</button>
+    </div>
 
-            alert(`Connecté en tant que ${user.role} : ${user.name}`);
+    <div class="note-list" id="noteList"></div>
 
-            document.getElementById("login").style.display = "none";
-            document.getElementById("dashboard").style.display = "block";
+    <div class="avg">
+      <div>Moyenne générale élève :</div>
+      <div class="value" id="avgValue">- /10</div>
+    </div>
+  </div>
+</div>
 
-            // Affichage du profil
-            document.getElementById("userImage").src = user.img;
-            document.getElementById("userName").textContent = user.name;
+<script>
+/* ====== Configuration (changer si tu veux) ====== */
+const PASSWORD_PROF = "prof123";   // mot de passe Prof (modifiable)
+const PASSWORD_ELEVE = "1234";     // mot de passe Élève (modifiable)
+const IMG_ELEVE = "ethan.jpg";     // image Ethan (mettre le fichier dans le même dossier)
+const NAME_PROF = "Aaron Dumoulin";
+const NAME_ELEVE = "Ethan Dumoulin";
 
-            // Afficher/masquer boutons selon rôle
-            if(user.role === "eleve") {
-                document.getElementById("addNoteBtn").style.display = "none";
-                document.getElementById("editMoyenneBtn").style.display = "none";
-            }
+/* ====== Données par défaut (si localStorage vide) ====== */
+const DEFAULT_NOTES = [
+  { matiere: "Mathématiques", detail: "1ère éval", note: 8, color: "red" },
+  { matiere: "QLM", detail: "QLM", note: 9, color: "black" },
+  { matiere: "QLM4", detail: "QLM4", note: 9, color: "black" },
+  { matiere: "Français", detail: "Écriture", note: 10, color: "yellow" }
+];
 
-            renderNotes();
-            renderMoyenne(user.role);
-        });
+/* ====== LocalStorage keys ====== */
+const KEY_NOTES = "pn_notes";
+const KEY_MOY = "pn_moyenne";
 
-        // Ajouter une note (Prof uniquement)
-        function addNote() {
-            const matiere = prompt("Matière ?");
-            if(!matiere) return;
-            const note = prompt("Note ?");
-            if(!note) return;
+/* ====== State ====== */
+let currentRole = null; // "prof" or "eleve"
+let notes = JSON.parse(localStorage.getItem(KEY_NOTES)) || DEFAULT_NOTES.slice();
+let moyenneSaved = localStorage.getItem(KEY_MOY); // could be null or string
 
-            notes.push({ matiere, note });
-            localStorage.setItem("notes", JSON.stringify(notes));
-            renderNotes();
+/* ====== Helpers ====== */
+function saveNotes(){ localStorage.setItem(KEY_NOTES, JSON.stringify(notes)); }
+function saveMoyenne(val){ moyenneSaved = (val === "" ? "" : String(val)); localStorage.setItem(KEY_MOY, moyenneSaved); }
+function computeAverage(){ if(notes.length===0) return null; const sum = notes.reduce((s,n)=> s + Number(n.note), 0); return Math.round((sum/notes.length)*10)/10; }
+
+/* ====== Render profile header ====== */
+function showProfile(role){
+  const profBox = document.getElementById("profileBox");
+  profBox.style.visibility = "visible";
+  const imgEl = document.getElementById("profileImg");
+  const nameEl = document.getElementById("profileName");
+  const roleEl = document.getElementById("profileRole");
+
+  if(role === "prof"){
+    imgEl.style.display = "none"; // pas d'image pour le prof selon ta demande
+    nameEl.textContent = NAME_PROF;
+    roleEl.textContent = "Professeur";
+  } else {
+    imgEl.style.display = "inline-block";
+    imgEl.src = IMG_ELEVE;
+    nameEl.textContent = NAME_ELEVE;
+    roleEl.textContent = "Élève";
+  }
+}
+
+/* ====== Render notes list ====== */
+function renderNotes(){
+  const list = document.getElementById("noteList");
+  list.innerHTML = "";
+  if(notes.length === 0){
+    list.innerHTML = `<div style="text-align:center;color:#eee;padding:18px">Aucune note</div>`;
+    return;
+  }
+  notes.forEach((n, idx) => {
+    let colorBar = "#222";
+    if(n.color === "red") colorBar = "#FF4136";
+    else if(n.color === "yellow") colorBar = "#FFB700";
+    else if(n.color === "black") colorBar = "#000";
+    else colorBar = "#999";
+
+    const node = document.createElement("div");
+    node.className = "note";
+    node.innerHTML = `
+      <div class="note-left">
+        <div class="note-dot" style="background:${colorBar}"></div>
+        <div>
+          <div class="note-title">${escapeHtml(n.matiere)}</div>
+          <div class="note-sub">${escapeHtml(n.detail || "")}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="note-score">${n.note}/10</div>
+        ${currentRole==="prof" ? `<button class="delete-btn" data-idx="${idx}" title="Supprimer">🗑️</button>` : ""}
+      </div>
+    `;
+    list.appendChild(node);
+  });
+
+  // attach delete handlers if prof
+  if(currentRole === "prof"){
+    document.querySelectorAll(".delete-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const i = Number(e.currentTarget.getAttribute("data-idx"));
+        if(confirm("Supprimer cette note ?")) {
+          notes.splice(i,1);
+          saveNotes();
+          renderNotes();
+          renderAverage();
         }
+      });
+    });
+  }
+}
 
-        // Afficher les notes
-        function renderNotes() {
-            const div = document.getElementById("notes");
-            div.innerHTML = "";
-            if(notes.length === 0) {
-                div.innerHTML = "<p>Aucune note ajoutée.</p>";
-                return;
-            }
-            notes.forEach((n,i)=>{
-                div.innerHTML += `<p>${i+1}. ${n.matiere} : ${n.note}</p>`;
-            });
-        }
+/* ====== Render average ====== */
+function renderAverage(){
+  const avgEl = document.getElementById("avgValue");
+  let display;
+  if(moyenneSaved !== null && moyenneSaved !== ""){
+    display = moyenneSaved + "/10";
+  } else {
+    const c = computeAverage();
+    display = (c === null ? "-/10" : c + "/10");
+  }
+  avgEl.textContent = display;
+}
 
-        // Afficher la moyenne et gérer l’accès
-        function renderMoyenne(userRole) {
-            document.getElementById("moyenne").textContent = moyenne;
-            if(userRole === "eleve") {
-                document.getElementById("editMoyenneBtn").style.display = "none";
-            } else {
-                document.getElementById("editMoyenneBtn").style.display = "inline-block";
-            }
-        }
+/* ====== Security: escape HTML for displayed text ====== */
+function escapeHtml(str){
+  if(!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
-        // Modifier la moyenne (Prof uniquement)
-        function editMoyenne() {
-            const newMoyenne = prompt("Nouvelle moyenne générale ?", moyenne);
-            if(newMoyenne !== null && newMoyenne.trim() !== "") {
-                moyenne = newMoyenne;
-                localStorage.setItem("moyenne", moyenne);
-                renderMoyenne("prof");
-            }
-        }
-    </script>
+/* ====== Login flow ====== */
+document.getElementById("loginBtn").addEventListener("click", ()=>{
+  const role = document.querySelector('input[name="role"]:checked').value;
+  const pass = document.getElementById("passwordInput").value.trim();
+  if(role === "prof"){
+    if(pass === PASSWORD_PROF){
+      currentRole = "prof";
+      afterLogin();
+    } else { alert("Mot de passe professeur incorrect."); return; }
+  } else {
+    if(pass === PASSWORD_ELEVE){
+      currentRole = "eleve";
+      afterLogin();
+    } else { alert("Mot de passe élève incorrect."); return; }
+  }
+});
+
+function afterLogin(){
+  document.getElementById("loginCard").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+  // hide the logo (it stays as left brand) and show profile
+  showProfile(currentRole);
+  // role-specific buttons
+  if(currentRole === "prof"){
+    document.getElementById("btnAddNote").style.display = "inline-block";
+    document.getElementById("btnEditAvg").style.display = "inline-block";
+  } else {
+    document.getElementById("btnAddNote").style.display = "none";
+    document.getElementById("btnEditAvg").style.display = "none";
+  }
+  renderNotes();
+  renderAverage();
+  // clear password input for security
+  document.getElementById("passwordInput").value = "";
+}
+
+/* ====== Add note (prof) ====== */
+document.getElementById("btnAddNote").addEventListener("click", ()=>{
+  const mat = prompt("Matière (ex : Mathématiques)");
+  if(!mat) return;
+  const detail = prompt("Détail (ex : 1ère éval) - facultatif") || "";
+  let note = prompt("Note sur 10 (ex : 8)");
+  if(note === null) return;
+  note = Number(note);
+  if(isNaN(note) || note < 0){
+    alert("Entrez un nombre valide.");
+    return;
+  }
+  // convert if >10 (assume scale 20)
+  if(note > 10) note = Math.round((note/20)*10*10)/10;
+  note = Math.round(note*10)/10;
+  const color = prompt("Couleur (red, yellow, black) - facultatif") || "red";
+  notes.push({matiere:mat, detail:detail, note:note, color: color});
+  saveNotes();
+  renderNotes();
+  renderAverage();
+});
+
+/* ====== Edit moyenne (prof) ====== */
+document.getElementById("btnEditAvg").addEventListener("click", ()=>{
+  let val = prompt("Saisir la moyenne générale (laisser vide pour remettre auto)", moyenneSaved || "");
+  if(val === null) return;
+  val = val.trim();
+  if(val === ""){
+    saveMoyenne("");
+    alert("Moyenne manuelle supprimée (calcul automatique sera affiché).");
+  } else {
+    let n = Number(val);
+    if(isNaN(n)){ alert("Valeur non numérique"); return; }
+    if(n < 0) n = 0;
+    if(n > 10) n = Math.round((n/20)*10*10)/10;
+    saveMoyenne(n);
+    alert("Moyenne enregistrée : " + n + "/10");
+  }
+  renderAverage();
+});
+
+/* ====== Logout ====== */
+document.getElementById("btnLogout").addEventListener("click", ()=>{
+  if(confirm("Déconnexion ?")){
+    currentRole = null;
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("loginCard").style.display = "block";
+    document.getElementById("profileBox").style.visibility = "hidden";
+    // reset header brand text to default
+    // (we keep app name + subtitle as is)
+  }
+});
+
+/* initial render */
+renderNotes();
+renderAverage();
+</script>
 </body>
 </html>
